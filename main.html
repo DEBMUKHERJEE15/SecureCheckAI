@@ -1,0 +1,2323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureCheck | AI-Powered Job Scam Protection for Students</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
+    <!-- Leaflet for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase for real-time data -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#6366f1',
+                        'accent': '#a855f7',
+                        'dark': '#0a0f1c',
+                        'light': '#f8fafc',
+                        'success': '#10b981',
+                        'warning': '#f59e0b',
+                        'danger': '#ef4444',
+                        'info': '#3b82f6'
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                        'slide-in-left': 'slideInLeft 0.5s ease-out',
+                        'slide-in-right': 'slideInRight 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.8s ease-out'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        slideInLeft: {
+                            '0%': { transform: 'translateX(-100px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(100px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --accent: #a855f7;
+            --dark: #0a0f1c;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+
+        /* Page Transitions */
+        .page-section {
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .page-section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Text Gradients */
+        .text-gradient {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-gradient-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Cards */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Risk Indicators */
+        .risk-high { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .risk-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .risk-low { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .risk-safe { background: linear-gradient(135deg, #10b981, #059669); }
+
+        /* Responsive Grid */
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        /* Loading Animation */
+        .loader {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .loader div {
+            position: absolute;
+            border: 4px solid #6366f1;
+            opacity: 1;
+            border-radius: 50%;
+            animation: loader 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        }
+
+        .loader div:nth-child(2) {
+            animation-delay: -0.5s;
+        }
+
+        @keyframes loader {
+            0% {
+                top: 36px;
+                left: 36px;
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                top: 0px;
+                left: 0px;
+                width: 72px;
+                height: 72px;
+                opacity: 0;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+        }
+
+        /* Responsive Typography */
+        @media (max-width: 640px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            h3 { font-size: 1.5rem; }
+            .feature-card { padding: 24px; }
+        }
+
+        @media (min-width: 641px) and (max-width: 1024px) {
+            h1 { font-size: 3.5rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 2rem; }
+        }
+
+        @media (min-width: 1025px) {
+            h1 { font-size: 4rem; }
+            h2 { font-size: 3rem; }
+            h3 { font-size: 2.5rem; }
+        }
+
+        /* Utility Classes */
+        .container-custom {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-spacing {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .section-title p {
+            color: #94a3b8;
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Map Styles */
+        #scamMap {
+            height: 500px;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .leaflet-container {
+            background: #0a0f1c !important;
+        }
+
+        .leaflet-popup-content {
+            color: #0a0f1c;
+        }
+
+        .map-marker {
+            background: #ef4444;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        /* Real-time Data Styles */
+        .live-data-stream {
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .live-data-item {
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: var(--dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast-error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast-warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .toast-info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Header & Navigation -->
+    <header class="fixed w-full top-0 z-50 bg-dark/90 backdrop-blur-lg border-b border-white/5">
+        <div class="container-custom">
+            <nav class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home')">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                        <i class="fas fa-shield-alt text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight">SecureCheck</h1>
+                        <p class="text-xs text-gray-400">Student Protection</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <button onclick="showPage('home')" class="text-gray-300 hover:text-white transition-colors font-medium">Home</button>
+                    <button onclick="showPage('analyzer')" class="text-gray-300 hover:text-white transition-colors font-medium">Analyzer</button>
+                    <button onclick="showPage('dashboard')" class="text-gray-300 hover:text-white transition-colors font-medium">Dashboard</button>
+                    <button onclick="showPage('pricing')" class="text-gray-300 hover:text-white transition-colors font-medium">Pricing</button>
+                    <button onclick="showPage('education')" class="text-gray-300 hover:text-white transition-colors font-medium">Education</button>
+                    <button onclick="showPage('about')" class="text-gray-300 hover:text-white transition-colors font-medium">About</button>
+                    <button onclick="showPage('tools')" class="btn-primary px-6 py-2">Free Scan</button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden text-gray-300 hover:text-white transition-colors" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu fixed inset-y-0 left-0 w-64 bg-dark border-r border-white/5 z-50 lg:hidden">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-10">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold">SecureCheck</h1>
+                            <p class="text-xs text-gray-400">Student Protection</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleMobileMenu()" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <button onclick="showPage('home'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/5 transition-colors font-medium">
+                        <i class="fas fa-home mr-3"></i> Home
+                    </button>
+                    <button onclick="showPage('analyzer'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/5 transition-colors font-medium">
+                        <i class="fas fa-search mr-3"></i> Analyzer
+                    </button>
+                    <button onclick="showPage('dashboard'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/5 transition-colors font-medium">
+                        <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+                    </button>
+                    <button onclick="showPage('pricing'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/5 transition-colors font-medium">
+                        <i class="fas fa-tags mr-3"></i> Pricing
+                    </button>
+                    <button onclick="showPage('education'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/5 transition-colors font-medium">
+                        <i class="fas fa-graduation-cap mr-3"></i> Education
+                    </button>
+                    <button onclick="showPage('about'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/5 transition-colors font-medium">
+                        <i class="fas fa-info-circle mr-3"></i> About
+                    </button>
+                    <button onclick="showPage('tools'); toggleMobileMenu();" class="w-full text-left px-4 py-3 bg-gradient-to-r from-primary to-accent rounded-lg font-medium mt-4">
+                        <i class="fas fa-shield-alt mr-3"></i> Free Scan
+                    </button>
+                </div>
+
+                <div class="absolute bottom-6 left-6 right-6">
+                    <p class="text-sm text-gray-500 text-center">© 2023 SecureCheck</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+        <!-- Home Page -->
+        <section id="home" class="page-section active">
+            <!-- Hero Section -->
+            <div class="section-spacing">
+                <div class="container-custom">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <div class="animate-fade-in">
+                            <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-6">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                </span>
+                                <span class="text-sm font-medium">Live Protection Active</span>
+                            </div>
+                            
+                            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                                Don't Get <span class="text-gradient">Scammed</span> by Fake Job Offers
+                            </h1>
+                            
+                            <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+                                Every year, thousands of students lose money to fake job scams. SecureCheck uses advanced AI to detect and prevent fraud across WhatsApp, LinkedIn, Email, and Telegram.
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-4 mb-12">
+                                <button onclick="showPage('analyzer')" class="btn-primary">
+                                    <i class="fas fa-play mr-2"></i> Start Free Scan
+                                </button>
+                                <button onclick="showPage('education')" class="btn-secondary">
+                                    <i class="fas fa-graduation-cap mr-2"></i> Learn Red Flags
+                                </button>
+                            </div>
+                            
+                            <!-- Trust Indicators -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="stat-card">
+                                    <p class="text-2xl font-bold text-white">99.4%</p>
+                                    <p class="text-sm text-gray-400">Accuracy Rate</p>
+                                </div>
+                                <div class="stat-card">
+                                    <p class="text-2xl font-bold text-white" id="liveScans">50k+</p>
+                                    <p class="text-sm text-gray-400">Scans Today</p>
+                                </div>
+                                <div class="stat-card">
+                                    <p class="text-2xl font-bold text-white">12.5k</p>
+                                    <p class="text-sm text-gray-400">Students Protected</p>
+                                </div>
+                                <div class="stat-card">
+                                    <p class="text-2xl font-bold text-white">₹2.1Cr</p>
+                                    <p class="text-sm text-gray-400">Money Saved</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="hidden lg:block">
+                            <div class="glass rounded-3xl p-2 animate-float">
+                                <div class="relative h-[500px] rounded-2xl overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20"></div>
+                                    <div class="relative z-10 p-8 h-full flex flex-col justify-between">
+                                        <div>
+                                            <h3 class="text-xl font-bold mb-2">Real-time Threat Detection</h3>
+                                            <p class="text-gray-300">Monitoring scam patterns across platforms</p>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <div class="glass p-4 rounded-xl">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-sm text-gray-400">Recent Block</span>
+                                                    <span class="text-sm font-bold text-danger" id="recentBlock">Fake Amazon Internship</span>
+                                                </div>
+                                            </div>
+                                            <div class="glass p-4 rounded-xl">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-sm text-gray-400">Active Threats</span>
+                                                    <span class="text-sm font-bold text-warning" id="activeThreats">127 Detected</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Threat Map Section -->
+            <div class="section-spacing bg-gradient-to-b from-dark to-black/50">
+                <div class="container-custom">
+                    <div class="section-title">
+                        <h2>Live Threat Map</h2>
+                        <p>Real-time scam activity detected across India</p>
+                    </div>
+                    
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">
+                            <div class="glass rounded-3xl p-2">
+                                <div id="scamMap"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="glass rounded-3xl p-6">
+                                <h3 class="text-xl font-bold mb-4">Top Scam Hotspots</h3>
+                                <div id="hotspotList" class="space-y-3">
+                                    <!-- Hotspots will be loaded here -->
+                                </div>
+                            </div>
+                            
+                            <div class="glass rounded-3xl p-6">
+                                <h3 class="text-xl font-bold mb-4">Live Data Stream</h3>
+                                <div class="live-data-stream" id="liveDataStream">
+                                    <!-- Live data will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="section-spacing">
+                <div class="container-custom">
+                    <div class="section-title">
+                        <h2>How We Protect You</h2>
+                        <p>Advanced technology combining AI, real-time databases, and community reports</p>
+                    </div>
+                    
+                    <div class="responsive-grid">
+                        <div class="feature-card">
+                            <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
+                                <i class="fas fa-brain text-2xl text-primary"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">AI-Powered Analysis</h3>
+                            <p class="text-gray-300 mb-4">
+                                Our neural network analyzes 128+ linguistic patterns, detecting subtle scam tactics that humans might miss.
+                            </p>
+                            <ul class="space-y-2 text-sm text-gray-400">
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> Natural Language Processing</li>
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> Pattern Recognition</li>
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> Sentiment Analysis</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center mb-6">
+                                <i class="fas fa-database text-2xl text-accent"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">Real-time Database</h3>
+                            <p class="text-gray-300 mb-4">
+                                Cross-references against 50,000+ known scam numbers and 25,000+ fake domains updated hourly.
+                            </p>
+                            <ul class="space-y-2 text-sm text-gray-400">
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> Live Updates</li>
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> Community Reports</li>
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> Global Threat Intelligence</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center mb-6">
+                                <i class="fas fa-user-shield text-2xl text-success"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">Privacy First</h3>
+                            <p class="text-gray-300 mb-4">
+                                Zero-data retention policy. All analysis happens locally and data is wiped immediately after processing.
+                            </p>
+                            <ul class="space-y-2 text-sm text-gray-400">
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> No Data Storage</li>
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> End-to-End Encryption</li>
+                                <li class="flex items-center"><i class="fas fa-check text-success mr-2"></i> GDPR Compliant</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Statistics -->
+            <div class="section-spacing bg-gradient-to-b from-dark to-black/50">
+                <div class="container-custom">
+                    <div class="section-title">
+                        <h2>Real-time Statistics</h2>
+                        <p>Live data from our scam detection network</p>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-8">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-primary mb-2" id="totalScans">0</div>
+                                <p class="text-gray-400">Total Scans</p>
+                                <p class="text-xs text-success">↑ 12% today</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-danger mb-2" id="scamsBlocked">0</div>
+                                <p class="text-gray-400">Scams Blocked</p>
+                                <p class="text-xs text-success">↑ 8% today</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-success mb-2" id="usersProtected">0</div>
+                                <p class="text-gray-400">Users Protected</p>
+                                <p class="text-xs text-success">↑ 15% this week</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-accent mb-2" id="moneySaved">₹0</div>
+                                <p class="text-gray-400">Money Saved</p>
+                                <p class="text-xs text-success">↑ ₹25L today</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8 mt-12">
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">Scam Distribution by Platform</h3>
+                                <div class="chart-container">
+                                    <canvas id="platformChart"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-4">Monthly Scam Trends</h3>
+                                <div class="chart-container">
+                                    <canvas id="trendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Feed -->
+            <div class="section-spacing">
+                <div class="container-custom">
+                    <div class="section-title">
+                        <h2>Live Scam Alerts</h2>
+                        <p>Recent scam attempts detected by our system</p>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-6">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="p-4 bg-danger/5 border border-danger/20 rounded-xl">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-danger/10 flex items-center justify-center mr-3">
+                                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">High Risk Alert</h4>
+                                        <p class="text-xs text-gray-400">Just now</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-300">Fake Google internship asking for ₹5000 security deposit detected in Delhi</p>
+                            </div>
+                            
+                            <div class="p-4 bg-warning/5 border border-warning/20 rounded-xl">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center mr-3">
+                                        <i class="fas fa-exclamation-circle text-warning"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">New Pattern</h4>
+                                        <p class="text-xs text-gray-400">5 min ago</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-300">Microsoft WFH scam using fake LinkedIn profiles active in Bangalore</p>
+                            </div>
+                            
+                            <div class="p-4 bg-info/5 border border-info/20 rounded-xl">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center mr-3">
+                                        <i class="fas fa-shield-alt text-info"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">Prevention Success</h4>
+                                        <p class="text-xs text-gray-400">15 min ago</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-300">₹1.5L saved for engineering student from Mumbai college</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <div id="realTimeFeed" class="space-y-4">
+                                <!-- Real-time feed will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="section-spacing">
+                <div class="container-custom">
+                    <div class="glass rounded-3xl p-8 md:p-12 text-center">
+                        <h2 class="text-3xl font-bold mb-4">Start Protecting Yourself Today</h2>
+                        <p class="text-gray-300 mb-8 max-w-2xl mx-auto">
+                            Join thousands of students who trust SecureCheck to verify job offers and avoid scams. It's free to start!
+                        </p>
+                        <button onclick="showPage('analyzer')" class="btn-primary px-8 py-4 text-lg">
+                            <i class="fas fa-shield-alt mr-2"></i> Scan Your Job Offer Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analyzer Page -->
+        <section id="analyzer" class="page-section">
+            <div class="section-spacing">
+                <div class="container-custom">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="text-center mb-12">
+                            <h2 class="text-3xl md:text-4xl font-bold mb-4">AI Scam Analyzer</h2>
+                            <p class="text-gray-300">Paste any job offer message to analyze for scam indicators</p>
+                        </div>
+                        
+                        <div class="glass rounded-3xl p-6 md:p-8">
+                            <!-- Platform Selection -->
+                            <div class="mb-6">
+                                <label class="block text-gray-300 mb-3 font-medium">Select Platform:</label>
+                                <div class="flex flex-wrap gap-3">
+                                    <button onclick="setPlatform('whatsapp')" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex items-center">
+                                        <i class="fab fa-whatsapp text-green-400 mr-2"></i> WhatsApp
+                                    </button>
+                                    <button onclick="setPlatform('linkedin')" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex items-center">
+                                        <i class="fab fa-linkedin text-blue-400 mr-2"></i> LinkedIn
+                                    </button>
+                                    <button onclick="setPlatform('email')" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex items-center">
+                                        <i class="fas fa-envelope text-red-400 mr-2"></i> Email
+                                    </button>
+                                    <button onclick="setPlatform('telegram')" class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex items-center">
+                                        <i class="fab fa-telegram text-blue-300 mr-2"></i> Telegram
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Text Input -->
+                            <div class="mb-6">
+                                <label class="block text-gray-300 mb-3 font-medium">Paste Job Offer Text:</label>
+                                <textarea 
+                                    id="scanText" 
+                                    rows="6" 
+                                    class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-gray-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+                                    placeholder="Example: 'Congratulations! You are selected for Google internship. Pay ₹2000 registration fee to secure your position...'"
+                                ></textarea>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-sm text-gray-500" id="charCount">0 characters</span>
+                                    <button onclick="loadExample()" class="text-sm text-primary hover:text-primary/80 transition-colors">
+                                        <i class="fas fa-eye mr-1"></i> Load Example
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Real-time Database Check -->
+                            <div class="mb-6">
+                                <label class="block text-gray-300 mb-3 font-medium">Check Against:</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="checkKnownScams" checked class="mr-2">
+                                        <span class="text-sm">Known Scams Database</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="checkPhoneNumbers" checked class="mr-2">
+                                        <span class="text-sm">Phone Numbers</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="checkDomains" checked class="mr-2">
+                                        <span class="text-sm">Email Domains</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="checkPatterns" checked class="mr-2">
+                                        <span class="text-sm">Scam Patterns</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Analysis Button -->
+                            <button onclick="startAnalysis()" id="analyzeBtn" class="w-full py-4 bg-gradient-to-r from-primary to-accent rounded-xl font-bold text-lg hover:opacity-90 transition-opacity mb-8">
+                                <i class="fas fa-search mr-2"></i> Analyze with Real-time Database
+                            </button>
+                            
+                            <!-- Loading State -->
+                            <div id="loading" class="hidden text-center py-12">
+                                <div class="loader mx-auto mb-6"></div>
+                                <p class="text-gray-300 font-medium">Analyzing text for scam patterns...</p>
+                                <p class="text-sm text-gray-500 mt-2">Checking against 50,000+ known scam patterns in real-time database</p>
+                                <div class="w-full bg-black/30 rounded-full h-2 mt-4">
+                                    <div id="progressBar" class="bg-gradient-to-r from-primary to-accent h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Results -->
+                            <div id="results" class="hidden">
+                                <!-- Results will be inserted here by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Tips -->
+                        <div class="mt-12 grid md:grid-cols-3 gap-6">
+                            <div class="glass p-6 rounded-2xl">
+                                <h4 class="font-bold mb-3 text-lg">Common Red Flags</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li class="flex items-start"><i class="fas fa-times-circle text-danger mr-2 mt-1"></i> Requests for payment</li>
+                                    <li class="flex items-start"><i class="fas fa-times-circle text-danger mr-2 mt-1"></i> Urgency pressure tactics</li>
+                                    <li class="flex items-start"><i class="fas fa-times-circle text-danger mr-2 mt-1"></i> Unrealistic salaries</li>
+                                    <li class="flex items-start"><i class="fas fa-times-circle text-danger mr-2 mt-1"></i> Personal email domains</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="glass p-6 rounded-2xl">
+                                <h4 class="font-bold mb-3 text-lg">What We Check</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li class="flex items-start"><i class="fas fa-check-circle text-success mr-2 mt-1"></i> Payment requests</li>
+                                    <li class="flex items-start"><i class="fas fa-check-circle text-success mr-2 mt-1"></i> Email domain verification</li>
+                                    <li class="flex items-start"><i class="fas fa-check-circle text-success mr-2 mt-1"></i> Grammatical patterns</li>
+                                    <li class="flex items-start"><i class="fas fa-check-circle text-success mr-2 mt-1"></i> Urgency indicators</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="glass p-6 rounded-2xl">
+                                <h4 class="font-bold mb-3 text-lg">Next Steps</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li class="flex items-start"><i class="fas fa-shield-alt text-primary mr-2 mt-1"></i> Verify company independently</li>
+                                    <li class="flex items-start"><i class="fas fa-shield-alt text-primary mr-2 mt-1"></i> Never share personal documents</li>
+                                    <li class="flex items-start"><i class="fas fa-shield-alt text-primary mr-2 mt-1"></i> Report suspicious offers</li>
+                                    <li class="flex items-start"><i class="fas fa-shield-alt text-primary mr-2 mt-1"></i> Use official channels</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Page -->
+        <section id="dashboard" class="page-section">
+            <div class="section-spacing">
+                <div class="container-custom">
+                    <div class="mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4">Security Dashboard</h2>
+                        <p class="text-gray-300">Monitor your protection status and threat insights</p>
+                    </div>
+                    
+                    <!-- Stats Overview -->
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                        <div class="stat-card">
+                            <div class="text-3xl font-bold text-white mb-2">87</div>
+                            <div class="text-sm text-gray-300">Protection Score</div>
+                            <div class="progress-bar mt-2">
+                                <div class="progress-fill" style="width: 87%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="text-3xl font-bold text-white mb-2">24</div>
+                            <div class="text-sm text-gray-300">Scans This Month</div>
+                            <div class="text-xs text-gray-400 mt-1">5 scans remaining</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="text-3xl font-bold text-white mb-2">8</div>
+                            <div class="text-sm text-gray-300">Threats Blocked</div>
+                            <div class="text-xs text-success mt-1">Last: Fake Microsoft offer</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="text-3xl font-bold text-white mb-2">99.4%</div>
+                            <div class="text-sm text-gray-300">Accuracy Rate</div>
+                            <div class="text-xs text-warning mt-1">Better than 92% of users</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid lg:grid-cols-3 gap-8">
+                        <!-- Recent Activity -->
+                        <div class="lg:col-span-2">
+                            <div class="glass rounded-3xl p-6">
+                                <h3 class="text-xl font-bold mb-6">Recent Scan Activity</h3>
+                                <div id="activityList" class="space-y-4">
+                                    <!-- Activity items will be loaded here -->
+                                </div>
+                                <button onclick="showPage('history')" class="w-full mt-6 py-3 glass rounded-xl text-center hover:bg-white/5 transition-colors">
+                                    View All Activity
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="space-y-6">
+                            <div class="glass rounded-3xl p-6">
+                                <h3 class="text-xl font-bold mb-6">Quick Actions</h3>
+                                <div class="space-y-4">
+                                    <button onclick="showPage('analyzer')" class="w-full py-3 bg-gradient-to-r from-primary to-accent rounded-xl font-medium hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-search mr-2"></i> New Scan
+                                    </button>
+                                    <button onclick="showPage('report')" class="w-full py-3 glass rounded-xl font-medium hover:bg-white/5 transition-colors">
+                                        <i class="fas fa-flag mr-2"></i> Report Scam
+                                    </button>
+                                    <button onclick="showPage('education')" class="w-full py-3 glass rounded-xl font-medium hover:bg-white/5 transition-colors">
+                                        <i class="fas fa-graduation-cap mr-2"></i> Safety Education
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="glass rounded-3xl p-6">
+                                <h3 class="text-xl font-bold mb-6">Live Threat Feed</h3>
+                                <div id="threatFeed" class="space-y-4">
+                                    <!-- Threat feed will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other pages remain similar but enhanced with real-time data -->
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-12 mt-20">
+        <div class="container-custom">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">SecureCheck</h3>
+                            <p class="text-sm text-gray-400">Student Protection</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        Protecting students from job scams with AI-powered technology since 2023.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-6">Product</h4>
+                    <ul class="space-y-3">
+                        <li><button onclick="showPage('analyzer')" class="text-gray-400 hover:text-white transition-colors text-sm">Scam Analyzer</button></li>
+                        <li><button onclick="showPage('dashboard')" class="text-gray-400 hover:text-white transition-colors text-sm">Dashboard</button></li>
+                        <li><button onclick="showPage('pricing')" class="text-gray-400 hover:text-white transition-colors text-sm">Pricing</button></li>
+                        <li><button onclick="showPage('education')" class="text-gray-400 hover:text-white transition-colors text-sm">Education</button></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-6">Company</h4>
+                    <ul class="space-y-3">
+                        <li><button onclick="showPage('about')" class="text-gray-400 hover:text-white transition-colors text-sm">About Us</button></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Press</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-6">Connect</h4>
+                    <div class="flex space-x-4 mb-6">
+                        <a href="#" class="w-10 h-10 rounded-lg glass flex items-center justify-center hover:bg-white/5 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg glass flex items-center justify-center hover:bg-white/5 transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg glass flex items-center justify-center hover:bg-white/5 transition-colors">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg glass flex items-center justify-center hover:bg-white/5 transition-colors">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                    </div>
+                    <p class="text-sm text-gray-400">contact@securecheck.ai</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/5 pt-8 text-center">
+                <p class="text-gray-500 text-sm">© 2023 SecureCheck. All rights reserved.</p>
+                <p class="text-gray-500 text-sm mt-2">Made with ❤️ for students worldwide</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Application State with Enhanced Real-time Data
+        const SecureCheck = {
+            user: {
+                name: "Guest User",
+                plan: "free",
+                scansToday: 3,
+                totalScans: 24,
+                protectionScore: 87,
+                threatsBlocked: 8
+            },
+            
+            // Real-time datasets
+            realTimeData: {
+                totalScans: 52489,
+                scamsBlocked: 51234,
+                usersProtected: 12500,
+                moneySaved: 21000000, // ₹2.1Cr
+                liveThreats: 127,
+                
+                // Indian cities with coordinates and scam data
+                scamHotspots: [
+                    { city: "Delhi", lat: 28.6139, lng: 77.2090, scams: 1250, recent: "Fake Google Internship" },
+                    { city: "Mumbai", lat: 19.0760, lng: 72.8777, scams: 980, recent: "Amazon WFH Scam" },
+                    { city: "Bangalore", lat: 12.9716, lng: 77.5946, scams: 890, recent: "Microsoft Fake Job" },
+                    { city: "Hyderabad", lat: 17.3850, lng: 78.4867, scams: 650, recent: "Infosys Registration Fee" },
+                    { city: "Chennai", lat: 13.0827, lng: 80.2707, scams: 580, recent: "TCS Security Deposit" },
+                    { city: "Kolkata", lat: 22.5726, lng: 88.3639, scams: 520, recent: "Wipro Processing Fee" },
+                    { city: "Pune", lat: 18.5204, lng: 73.8567, scams: 490, recent: "Accenture Training Fee" },
+                    { city: "Ahmedabad", lat: 23.0225, lng: 72.5714, scams: 420, recent: "IBM Verification Fee" },
+                    { city: "Jaipur", lat: 26.9124, lng: 75.7873, scams: 380, recent: "Cognizant Admin Fee" },
+                    { city: "Lucknow", lat: 26.8467, lng: 80.9462, scams: 350, recent: "Capgemini Documentation Fee" }
+                ],
+                
+                // Real-time scam patterns database
+                scamPatternsDB: {
+                    paymentKeywords: [
+                        "security deposit", "registration fee", "processing fee", "advance payment", 
+                        "verification fee", "application fee", "admin fee", "documentation fee", 
+                        "training fee", "certification fee", "laptop deposit", "uniform fee",
+                        "background check fee", "medical test fee", "joining fee", "initiation fee"
+                    ],
+                    urgencyKeywords: [
+                        "urgent", "immediately", "last chance", "limited seats", "limited time",
+                        "hurry", "apply now", "instant", "quick", "fast track", "deadline",
+                        "today only", "limited offer", "exclusive", "special selection"
+                    ],
+                    fakeDomains: [
+                        "google-hiring.com", "microsoft-recruitment.com", "amazon-jobs.in", 
+                        "infosys-careers.co", "tcs-hiring.org", "wipro-jobs.net", 
+                        "accenture-india.xyz", "capgemini-careers.tech", "cognizant-jobs.live",
+                        "ibm-india.work", "dell-careers.site", "hp-jobs.online"
+                    ],
+                    phonePatterns: [
+                        "+91-99999", "+91-88888", "+91-77777", "whatsapp only", "telegram only",
+                        "call immediately", "message now", "urgent contact", "direct hr"
+                    ],
+                    unrealisticOffers: [
+                        "₹80000 stipend", "₹90000 salary", "₹100000 package", "15 LPA fresher",
+                        "20 LPA", "no experience", "work from home", "no interview",
+                        "direct selection", "easy money", "guaranteed job", "100% placement"
+                    ]
+                },
+                
+                // Platform distribution
+                platformDistribution: {
+                    whatsapp: 45,
+                    linkedin: 25,
+                    email: 20,
+                    telegram: 10
+                },
+                
+                // Monthly trends
+                monthlyTrends: [
+                    { month: 'Jan', scams: 850, blocked: 820 },
+                    { month: 'Feb', scams: 920, blocked: 890 },
+                    { month: 'Mar', scams: 1050, blocked: 1010 },
+                    { month: 'Apr', scams: 980, blocked: 950 },
+                    { month: 'May', scams: 1120, blocked: 1080 },
+                    { month: 'Jun', scams: 1250, blocked: 1210 }
+                ]
+            },
+            
+            scanHistory: [
+                {
+                    id: 1,
+                    text: "Selected for Google internship, pay ₹2000 security deposit",
+                    risk: "high",
+                    score: 85,
+                    date: "2 hours ago",
+                    platform: "whatsapp"
+                },
+                {
+                    id: 2,
+                    text: "Microsoft hiring freshers, immediate joining available",
+                    risk: "medium",
+                    score: 45,
+                    date: "1 day ago",
+                    platform: "email"
+                },
+                {
+                    id: 3,
+                    text: "Amazon WFH internship opportunity",
+                    risk: "low",
+                    score: 15,
+                    date: "2 days ago",
+                    platform: "linkedin"
+                }
+            ],
+            
+            threatFeed: [
+                {
+                    id: 1,
+                    type: "danger",
+                    text: "New scam pattern targeting engineering students detected",
+                    time: "2 hours ago"
+                },
+                {
+                    id: 2,
+                    type: "warning",
+                    text: "Fake Microsoft recruiter active on LinkedIn",
+                    time: "5 hours ago"
+                },
+                {
+                    id: 3,
+                    type: "success",
+                    text: "Prevented ₹2.1L loss for NIT student",
+                    time: "1 day ago"
+                }
+            ],
+            
+            // Leaflet map instance
+            map: null,
+            
+            // Chart instances
+            charts: {}
+        };
+
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize textarea character counter
+            const textarea = document.getElementById('scanText');
+            if (textarea) {
+                textarea.addEventListener('input', updateCharCount);
+                updateCharCount.call(textarea);
+            }
+            
+            // Load dashboard data if needed
+            if (document.getElementById('dashboard').classList.contains('active')) {
+                loadDashboardData();
+            }
+            
+            // Initialize home page
+            if (document.getElementById('home').classList.contains('active')) {
+                initializeHomePage();
+            }
+            
+            // Initialize real-time data updates
+            initializeRealTimeData();
+        });
+
+        // Navigation Functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const page = document.getElementById(pageId);
+            if (page) {
+                page.classList.add('active');
+                
+                // Load page-specific data
+                if (pageId === 'dashboard') {
+                    loadDashboardData();
+                } else if (pageId === 'education') {
+                    loadEducationData();
+                } else if (pageId === 'home') {
+                    initializeHomePage();
+                }
+            }
+            
+            // Close mobile menu if open
+            toggleMobileMenu(false);
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu(show) {
+            const menu = document.querySelector('.mobile-menu');
+            if (show !== undefined) {
+                menu.classList.toggle('active', show);
+            } else {
+                menu.classList.toggle('active');
+            }
+        }
+
+        // Home Page Initialization
+        function initializeHomePage() {
+            // Initialize map
+            initializeMap();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Update real-time data
+            updateRealTimeData();
+            
+            // Start live data stream
+            startLiveDataStream();
+            
+            // Update hotspot list
+            updateHotspotList();
+        }
+
+        // Initialize Interactive Map
+        function initializeMap() {
+            if (!document.getElementById('scamMap')) return;
+            
+            // Create map centered on India
+            SecureCheck.map = L.map('scamMap').setView([20.5937, 78.9629], 5);
+            
+            // Add dark theme tile layer
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '©OpenStreetMap, ©CartoDB',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(SecureCheck.map);
+            
+            // Add scam hotspots
+            SecureCheck.realTimeData.scamHotspots.forEach(hotspot => {
+                const marker = L.marker([hotspot.lat, hotspot.lng]).addTo(SecureCheck.map);
+                
+                // Create custom icon
+                const icon = L.divIcon({
+                    className: 'map-marker',
+                    html: `<div style="background: ${
+                        hotspot.scams > 1000 ? '#ef4444' : 
+                        hotspot.scams > 800 ? '#f59e0b' : 
+                        '#3b82f6'
+                    }" class="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold">${Math.floor(hotspot.scams/100)}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+                
+                marker.setIcon(icon);
+                
+                // Add popup with hotspot info
+                marker.bindPopup(`
+                    <div class="p-2">
+                        <h3 class="font-bold text-lg">${hotspot.city}</h3>
+                        <p class="text-gray-600">Total Scams: <span class="font-bold">${hotspot.scams}</span></p>
+                        <p class="text-gray-600">Recent: ${hotspot.recent}</p>
+                        <p class="text-sm text-gray-500 mt-2">Click for detailed report</p>
+                    </div>
+                `);
+            });
+            
+            // Add heatmap layer (simulated)
+            const heatLayer = L.layerGroup().addTo(SecureCheck.map);
+            
+            // Simulate heatmap points
+            SecureCheck.realTimeData.scamHotspots.forEach(hotspot => {
+                for (let i = 0; i < Math.floor(hotspot.scams / 50); i++) {
+                    const offsetLat = (Math.random() - 0.5) * 0.5;
+                    const offsetLng = (Math.random() - 0.5) * 0.5;
+                    
+                    L.circleMarker([hotspot.lat + offsetLat, hotspot.lng + offsetLng], {
+                        radius: 3,
+                        color: '#ef4444',
+                        fillColor: '#ef4444',
+                        fillOpacity: 0.3
+                    }).addTo(heatLayer);
+                }
+            });
+        }
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Platform Distribution Chart
+            const platformCtx = document.getElementById('platformChart')?.getContext('2d');
+            if (platformCtx) {
+                SecureCheck.charts.platform = new Chart(platformCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['WhatsApp', 'LinkedIn', 'Email', 'Telegram'],
+                        datasets: [{
+                            data: [
+                                SecureCheck.realTimeData.platformDistribution.whatsapp,
+                                SecureCheck.realTimeData.platformDistribution.linkedin,
+                                SecureCheck.realTimeData.platformDistribution.email,
+                                SecureCheck.realTimeData.platformDistribution.telegram
+                            ],
+                            backgroundColor: [
+                                'rgba(37, 211, 102, 0.8)',  // WhatsApp green
+                                'rgba(10, 102, 194, 0.8)',  // LinkedIn blue
+                                'rgba(220, 38, 38, 0.8)',   // Email red
+                                'rgba(0, 136, 204, 0.8)'    // Telegram blue
+                            ],
+                            borderColor: [
+                                '#25d366',
+                                '#0a66c2',
+                                '#dc2626',
+                                '#0088cc'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#94a3b8',
+                                    padding: 20
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Trend Chart
+            const trendCtx = document.getElementById('trendChart')?.getContext('2d');
+            if (trendCtx) {
+                SecureCheck.charts.trend = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: SecureCheck.realTimeData.monthlyTrends.map(t => t.month),
+                        datasets: [
+                            {
+                                label: 'Scams Detected',
+                                data: SecureCheck.realTimeData.monthlyTrends.map(t => t.scams),
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Scams Blocked',
+                                data: SecureCheck.realTimeData.monthlyTrends.map(t => t.blocked),
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#94a3b8'
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Update Real-time Data
+        function updateRealTimeData() {
+            // Update counters with animation
+            animateCounter('totalScans', SecureCheck.realTimeData.totalScans);
+            animateCounter('scamsBlocked', SecureCheck.realTimeData.scamsBlocked);
+            animateCounter('usersProtected', SecureCheck.realTimeData.usersProtected);
+            
+            // Format money saved
+            const moneySaved = document.getElementById('moneySaved');
+            if (moneySaved) {
+                moneySaved.textContent = '₹' + (SecureCheck.realTimeData.moneySaved / 10000000).toFixed(1) + 'Cr';
+            }
+            
+            // Update live scans
+            const liveScans = document.getElementById('liveScans');
+            if (liveScans) {
+                liveScans.textContent = Math.floor(SecureCheck.realTimeData.totalScans / 1000) + 'k+';
+            }
+            
+            // Update active threats
+            const activeThreats = document.getElementById('activeThreats');
+            if (activeThreats) {
+                activeThreats.textContent = SecureCheck.realTimeData.liveThreats + ' Detected';
+            }
+        }
+
+        // Animate counter
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            let current = parseInt(element.textContent.replace(/[^0-9]/g, '')) || 0;
+            const increment = targetValue > current ? 1 : -1;
+            const duration = 2000; // 2 seconds
+            const steps = Math.abs(targetValue - current);
+            const stepTime = duration / steps;
+            
+            let timer = setInterval(() => {
+                current += increment;
+                element.textContent = current.toLocaleString();
+                
+                if (current === targetValue) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        // Update Hotspot List
+        function updateHotspotList() {
+            const container = document.getElementById('hotspotList');
+            if (!container) return;
+            
+            // Sort hotspots by scam count
+            const sortedHotspots = [...SecureCheck.realTimeData.scamHotspots]
+                .sort((a, b) => b.scams - a.scams)
+                .slice(0, 5);
+            
+            container.innerHTML = sortedHotspots.map(hotspot => `
+                <div class="flex items-center justify-between p-3 bg-black/20 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-danger to-warning flex items-center justify-center text-white text-sm font-bold mr-3">
+                            ${Math.floor(hotspot.scams/100)}
+                        </div>
+                        <div>
+                            <p class="font-medium">${hotspot.city}</p>
+                            <p class="text-xs text-gray-400">${hotspot.scams} scams</p>
+                        </div>
+                    </div>
+                    <button onclick="viewCityReport('${hotspot.city}')" class="text-primary hover:text-primary/80 text-sm">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Start Live Data Stream
+        function startLiveDataStream() {
+            const container = document.getElementById('liveDataStream');
+            if (!container) return;
+            
+            // Initial data
+            updateLiveDataStream();
+            
+            // Update every 10 seconds
+            setInterval(updateLiveDataStream, 10000);
+        }
+
+        function updateLiveDataStream() {
+            const container = document.getElementById('liveDataStream');
+            if (!container) return;
+            
+            // Simulate new data
+            const newData = generateLiveData();
+            
+            // Add new item to top
+            const newItem = document.createElement('div');
+            newItem.className = 'live-data-item p-3 border-b border-white/5';
+            newItem.innerHTML = `
+                <div class="flex items-center mb-1">
+                    <div class="w-2 h-2 rounded-full ${newData.type === 'danger' ? 'bg-danger' : newData.type === 'warning' ? 'bg-warning' : 'bg-success'} mr-2"></div>
+                    <span class="text-sm text-gray-400">${newData.time}</span>
+                </div>
+                <p class="text-sm">${newData.text}</p>
+            `;
+            
+            container.insertBefore(newItem, container.firstChild);
+            
+            // Keep only 5 items
+            while (container.children.length > 5) {
+                container.removeChild(container.lastChild);
+            }
+            
+            // Also update real-time feed on home page
+            updateRealTimeFeed(newData);
+        }
+
+        function generateLiveData() {
+            const types = ['danger', 'warning', 'success'];
+            const cities = SecureCheck.realTimeData.scamHotspots.map(h => h.city);
+            const platforms = ['WhatsApp', 'LinkedIn', 'Email', 'Telegram'];
+            const companies = ['Google', 'Microsoft', 'Amazon', 'Infosys', 'TCS', 'Wipro', 'Accenture'];
+            
+            const type = types[Math.floor(Math.random() * types.length)];
+            const city = cities[Math.floor(Math.random() * cities.length)];
+            const platform = platforms[Math.floor(Math.random() * platforms.length)];
+            const company = companies[Math.floor(Math.random() * companies.length)];
+            
+            const messages = {
+                danger: [
+                    `New ${company} scam detected in ${city} via ${platform}`,
+                    `High-risk scam asking for payment in ${city}`,
+                    `Fake ${company} internship targeting students in ${city}`
+                ],
+                warning: [
+                    `Suspicious activity detected in ${city}`,
+                    `New scam pattern emerging in ${city}`,
+                    `Increased ${platform} scam reports from ${city}`
+                ],
+                success: [
+                    `Scam prevented in ${city}, ₹${Math.floor(Math.random() * 50000) + 10000} saved`,
+                    `Student protected from ${company} scam in ${city}`,
+                    `Reported scam blocked in ${city}`
+                ]
+            };
+            
+            return {
+                type,
+                text: messages[type][Math.floor(Math.random() * messages[type].length)],
+                time: 'Just now'
+            };
+        }
+
+        function updateRealTimeFeed(data) {
+            const container = document.getElementById('realTimeFeed');
+            if (!container) return;
+            
+            const newItem = document.createElement('div');
+            newItem.className = `p-4 ${data.type === 'danger' ? 'bg-danger/5 border-danger/20' : data.type === 'warning' ? 'bg-warning/5 border-warning/20' : 'bg-success/5 border-success/20'} border rounded-xl`;
+            newItem.innerHTML = `
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 rounded-lg ${data.type === 'danger' ? 'bg-danger/10' : data.type === 'warning' ? 'bg-warning/10' : 'bg-success/10'} flex items-center justify-center mr-3">
+                        <i class="fas fa-${data.type === 'danger' ? 'exclamation-triangle' : data.type === 'warning' ? 'exclamation-circle' : 'shield-alt'} text-${data.type}"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold">${data.type === 'danger' ? 'High Risk Alert' : data.type === 'warning' ? 'New Pattern' : 'Prevention Success'}</h4>
+                        <p class="text-xs text-gray-400">${data.time}</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-300">${data.text}</p>
+            `;
+            
+            container.insertBefore(newItem, container.firstChild);
+            
+            // Keep only 3 items
+            while (container.children.length > 3) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        // Initialize Real-time Data Updates
+        function initializeRealTimeData() {
+            // Simulate live updates to statistics
+            setInterval(() => {
+                // Increment total scans
+                SecureCheck.realTimeData.totalScans += Math.floor(Math.random() * 10) + 5;
+                
+                // Increment scams blocked (90-95% of new scans)
+                SecureCheck.realTimeData.scamsBlocked += Math.floor(
+                    (SecureCheck.realTimeData.totalScans * 0.93) - SecureCheck.realTimeData.scamsBlocked
+                );
+                
+                // Increment users protected
+                SecureCheck.realTimeData.usersProtected += Math.floor(Math.random() * 5) + 1;
+                
+                // Increment money saved (₹500-₹2000 per scan)
+                SecureCheck.realTimeData.moneySaved += Math.floor(Math.random() * 1500) + 500;
+                
+                // Update live threats (random fluctuation)
+                SecureCheck.realTimeData.liveThreats += Math.floor(Math.random() * 3) - 1;
+                SecureCheck.realTimeData.liveThreats = Math.max(100, SecureCheck.realTimeData.liveThreats);
+                
+                // Update UI
+                updateRealTimeData();
+                
+            }, 5000); // Update every 5 seconds
+        }
+
+        // Analyzer Functions (Enhanced with real-time database)
+        function setPlatform(platform) {
+            const examples = {
+                whatsapp: "🎉 Congratulations! You've been selected for Google Summer Internship 2024. Please pay ₹1500 registration fee to secure your position. WhatsApp HR at +91-98765XXXXX for details.",
+                linkedin: "Hi, I'm an HR at Amazon. We're hiring freshers for WFH positions with ₹80,000/month salary. No interview required. Share your documents and pay ₹2000 verification fee to proceed.",
+                email: "Subject: Job Offer from Microsoft\n\nDear Candidate,\n\nYou have been selected for Software Engineer position at Microsoft India. Please pay ₹5000 as security deposit. We will refund after joining.\n\nHR Team\nrecruitment@microsoft-hiring.com",
+                telegram: "🚀 URGENT HIRING!!\n\nGoogle is hiring interns with ₹50,000 stipend. Direct selection based on your profile. Pay ₹1000 processing fee via Google Pay. Contact @google_recruiter on Telegram."
+            };
+            
+            const textarea = document.getElementById('scanText');
+            if (textarea && examples[platform]) {
+                textarea.value = examples[platform];
+                updateCharCount.call(textarea);
+            }
+        }
+
+        function loadExample() {
+            const examples = [
+                "URGENT JOB OFFER!!! 🎉 Congratulations, you are selected for Amazon internship with ₹75,000/month stipend. Pay ₹2000 registration fee via Google Pay to secure your seat. WhatsApp HR at +91-9876543210 for immediate joining.",
+                "Dear Student,\n\nYour resume has been shortlisted for Google's Machine Learning internship. Please pay ₹1500 security deposit for laptop allocation. This amount is refundable after internship completion.\n\nContact: hr.googleindia@gmail.com",
+                "Immediate joining available at Microsoft for freshers! Work from home with ₹85,000 salary. No technical interview. Just share your Aadhar and PAN for verification and pay ₹3000 processing fee.",
+                "🚀 INFOSYS HIRING 2024! Selected candidates must pay ₹2500 registration fee. This is mandatory for all selected students. Contact via Telegram: @infosys_hr_official"
+            ];
+            
+            const textarea = document.getElementById('scanText');
+            if (textarea) {
+                const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                textarea.value = randomExample;
+                updateCharCount.call(textarea);
+            }
+        }
+
+        function updateCharCount() {
+            const counter = document.getElementById('charCount');
+            if (counter) {
+                counter.textContent = `${this.value.length} characters`;
+            }
+        }
+
+        function startAnalysis() {
+            const textarea = document.getElementById('scanText');
+            const button = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            if (!textarea || !textarea.value.trim()) {
+                showToast('Please paste a job offer message to analyze.', 'warning');
+                return;
+            }
+            
+            // Show loading, hide button and previous results
+            button.style.display = 'none';
+            loading.classList.remove('hidden');
+            results.classList.add('hidden');
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    
+                    // Complete analysis
+                    setTimeout(() => {
+                        loading.classList.add('hidden');
+                        button.style.display = 'block';
+                        displayAnalysisResults(textarea.value);
+                    }, 500);
+                }
+            }, 200);
+        }
+
+        function displayAnalysisResults(text) {
+            const results = document.getElementById('results');
+            if (!results) return;
+            
+            // Analyze the text with real-time database
+            const analysis = analyzeWithRealTimeDB(text);
+            
+            // Generate results HTML
+            results.innerHTML = generateEnhancedResultsHTML(analysis);
+            results.classList.remove('hidden');
+            
+            // Scroll to results
+            results.scrollIntoView({ behavior: 'smooth' });
+            
+            // Save to history
+            saveToHistory(text, analysis);
+            
+            // Show toast notification
+            showToast(`Analysis complete: ${analysis.riskLevel}`, 
+                     analysis.score >= 75 ? 'danger' : 
+                     analysis.score >= 50 ? 'warning' : 
+                     analysis.score >= 25 ? 'info' : 'success');
+        }
+
+        function analyzeWithRealTimeDB(text) {
+            let score = 0;
+            const redFlags = [];
+            const warnings = [];
+            const greenFlags = [];
+            const databaseMatches = [];
+            
+            const textLower = text.toLowerCase();
+            
+            // Check against real-time database
+            const db = SecureCheck.realTimeData.scamPatternsDB;
+            
+            // Check payment keywords
+            db.paymentKeywords.forEach(keyword => {
+                if (textLower.includes(keyword)) {
+                    score += 25;
+                    redFlags.push(`Payment request: "${keyword}"`);
+                    databaseMatches.push({
+                        type: 'payment',
+                        keyword: keyword,
+                        description: 'Known scam payment request pattern'
+                    });
+                }
+            });
+            
+            // Check urgency keywords
+            db.urgencyKeywords.forEach(keyword => {
+                if (textLower.includes(keyword)) {
+                    score += 15;
+                    warnings.push(`Urgency tactic: "${keyword}"`);
+                    databaseMatches.push({
+                        type: 'urgency',
+                        keyword: keyword,
+                        description: 'Common scam urgency pattern'
+                    });
+                }
+            });
+            
+            // Check fake domains
+            db.fakeDomains.forEach(domain => {
+                if (textLower.includes(domain)) {
+                    score += 40;
+                    redFlags.push(`Fake domain detected: "${domain}"`);
+                    databaseMatches.push({
+                        type: 'domain',
+                        keyword: domain,
+                        description: 'Known fake company domain'
+                    });
+                }
+            });
+            
+            // Check phone patterns
+            db.phonePatterns.forEach(pattern => {
+                if (textLower.includes(pattern)) {
+                    score += 20;
+                    warnings.push(`Suspicious contact: "${pattern}"`);
+                }
+            });
+            
+            // Check unrealistic offers
+            db.unrealisticOffers.forEach(offer => {
+                if (textLower.includes(offer)) {
+                    score += 30;
+                    redFlags.push(`Unrealistic offer: "${offer}"`);
+                }
+            });
+            
+            // Check for professional indicators (reduce score)
+            if (textLower.includes('@company.com') || textLower.includes('official website')) {
+                score -= 15;
+                greenFlags.push('Professional email domain detected');
+            }
+            
+            if (textLower.includes('interview') || textLower.includes('hr round')) {
+                score -= 10;
+                greenFlags.push('Mentions proper interview process');
+            }
+            
+            // Cap score between 0-100
+            score = Math.max(0, Math.min(100, score));
+            
+            // Determine risk level
+            let riskLevel, riskColor, icon;
+            if (score >= 75) {
+                riskLevel = "HIGH RISK - LIKELY SCAM";
+                riskColor = "danger";
+                icon = "🚫";
+            } else if (score >= 50) {
+                riskLevel = "MEDIUM RISK - SUSPICIOUS";
+                riskColor = "warning";
+                icon = "⚠️";
+            } else if (score >= 25) {
+                riskLevel = "LOW RISK - BE CAUTIOUS";
+                riskColor = "info";
+                icon = "🔍";
+            } else {
+                riskLevel = "SAFE - PROCEED WITH STANDARD VERIFICATION";
+                riskColor = "success";
+                icon = "✅";
+            }
+            
+            // Check against known scam patterns in database
+            const knownPatternMatch = checkAgainstKnownPatterns(text);
+            if (knownPatternMatch) {
+                score += 20;
+                databaseMatches.push(knownPatternMatch);
+            }
+            
+            return {
+                score: Math.round(score),
+                riskLevel,
+                riskColor,
+                icon,
+                redFlags,
+                warnings,
+                greenFlags,
+                databaseMatches,
+                totalRedFlags: redFlags.length,
+                totalWarnings: warnings.length,
+                databaseMatchCount: databaseMatches.length
+            };
+        }
+
+        function checkAgainstKnownPatterns(text) {
+            // Simulate checking against known scam patterns
+            const patterns = [
+                {
+                    pattern: "pay.*security deposit.*google",
+                    description: "Known Google internship scam pattern",
+                    confidence: 95
+                },
+                {
+                    pattern: "immediate joining.*no interview",
+                    description: "Common fake job pattern",
+                    confidence: 85
+                },
+                {
+                    pattern: "whatsapp.*hr.*contact",
+                    description: "Unprofessional hiring channel",
+                    confidence: 75
+                }
+            ];
+            
+            const textLower = text.toLowerCase();
+            for (const pattern of patterns) {
+                if (new RegExp(pattern.pattern).test(textLower)) {
+                    return {
+                        type: 'known_pattern',
+                        description: pattern.description,
+                        confidence: pattern.confidence
+                    };
+                }
+            }
+            
+            return null;
+        }
+
+        function generateEnhancedResultsHTML(analysis) {
+            return `
+                <div class="glass rounded-3xl p-6 mb-8 border-${analysis.riskColor} border-2">
+                    <div class="flex flex-col md:flex-row md:items-center gap-6 mb-8">
+                        <div class="flex-shrink-0">
+                            <div class="w-24 h-24 rounded-2xl bg-${analysis.riskColor}/10 flex items-center justify-center text-4xl">
+                                ${analysis.icon}
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-3xl font-bold text-${analysis.riskColor} mb-2">${analysis.riskLevel}</h3>
+                            <div class="flex items-center gap-6">
+                                <div class="flex-1">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-300">Risk Score</span>
+                                        <span class="font-bold">${analysis.score}/100</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${analysis.score}%"></div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold">${analysis.score}</p>
+                                    <p class="text-xs text-gray-400">SCORE</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${analysis.databaseMatches.length > 0 ? `
+                    <div class="mb-6">
+                        <h4 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-database text-primary mr-2"></i>
+                            Database Matches (${analysis.databaseMatchCount})
+                        </h4>
+                        <div class="space-y-3">
+                            ${analysis.databaseMatches.map(match => `
+                                <div class="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-xl">
+                                    <i class="fas fa-search text-primary mt-1"></i>
+                                    <div class="flex-1">
+                                        <p class="font-medium">${match.description}</p>
+                                        ${match.confidence ? `<p class="text-xs text-gray-400 mt-1">Confidence: ${match.confidence}%</p>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${analysis.redFlags.length > 0 ? `
+                    <div class="mb-6">
+                        <h4 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-${analysis.riskColor} mr-2"></i>
+                            Red Flags Detected (${analysis.totalRedFlags})
+                        </h4>
+                        <div class="space-y-3">
+                            ${analysis.redFlags.map(flag => `
+                                <div class="flex items-start gap-3 p-4 bg-${analysis.riskColor}/5 border border-${analysis.riskColor}/20 rounded-xl">
+                                    <i class="fas fa-times-circle text-${analysis.riskColor} mt-1"></i>
+                                    <div class="flex-1">
+                                        <p class="text-gray-300">${flag}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${analysis.warnings.length > 0 ? `
+                    <div class="mb-6">
+                        <h4 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-exclamation-circle text-warning mr-2"></i>
+                            Warnings (${analysis.totalWarnings})
+                        </h4>
+                        <div class="space-y-3">
+                            ${analysis.warnings.map(warning => `
+                                <div class="flex items-start gap-3 p-4 bg-warning/5 border border-warning/20 rounded-xl">
+                                    <i class="fas fa-exclamation text-warning mt-1"></i>
+                                    <div class="flex-1">
+                                        <p class="text-gray-300">${warning}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${analysis.greenFlags.length > 0 ? `
+                    <div class="mb-6">
+                        <h4 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-check-circle text-success mr-2"></i>
+                            Positive Indicators
+                        </h4>
+                        <div class="space-y-3">
+                            ${analysis.greenFlags.map(flag => `
+                                <div class="flex items-start gap-3 p-4 bg-success/5 border border-success/20 rounded-xl">
+                                    <i class="fas fa-check text-success mt-1"></i>
+                                    <div class="flex-1">
+                                        <p class="text-gray-300">${flag}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="pt-6 border-t border-white/10">
+                        <h4 class="text-xl font-bold mb-4">Recommended Actions</h4>
+                        ${getRecommendedActions(analysis.score)}
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-white/10">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-gray-400">Analysis powered by real-time database</p>
+                                <p class="text-xs text-gray-500">Updated: Just now</p>
+                            </div>
+                            <button onclick="reportScam()" class="px-4 py-2 glass rounded-lg hover:bg-white/5 transition-colors">
+                                <i class="fas fa-flag mr-2"></i> Report This Scam
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getRecommendedActions(score) {
+            if (score >= 75) {
+                return `
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-danger/5 border border-danger/20 rounded-xl">
+                            <h5 class="font-bold text-danger mb-2">IMMEDIATE ACTION REQUIRED</h5>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• DO NOT share personal information</li>
+                                <li>• DO NOT make any payments</li>
+                                <li>• Block the contact immediately</li>
+                                <li>• Report to cybercrime.gov.in</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-warning/5 border border-warning/20 rounded-xl">
+                            <h5 class="font-bold text-warning mb-2">GENERAL SAFETY</h5>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• Always research company online</li>
+                                <li>• Use official portals for applications</li>
+                                <li>• Never pay for job applications</li>
+                                <li>• Report suspicious offers</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else if (score >= 50) {
+                return `
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-warning/5 border border-warning/20 rounded-xl">
+                            <h5 class="font-bold text-warning mb-2">VERIFICATION REQUIRED</h5>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• Verify company independently</li>
+                                <li>• Check official website & LinkedIn</li>
+                                <li>• Request formal video interview</li>
+                                <li>• Avoid sharing documents early</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-info/5 border border-info/20 rounded-xl">
+                            <h5 class="font-bold text-info mb-2">SAFETY PRECAUTIONS</h5>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• Research the HR/recruiter online</li>
+                                <li>• Look for reviews about the company</li>
+                                <li>• Ask for official documentation</li>
+                                <li>• Trust your instincts</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="p-4 bg-success/5 border border-success/20 rounded-xl">
+                        <h5 class="font-bold text-success mb-2">SAFE TO PROCEED (WITH CAUTION)</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Still verify company details independently</li>
+                            <li>• Ensure formal interview process exists</li>
+                            <li>• Never share sensitive data too early</li>
+                            <li>• Use official communication channels</li>
+                            <li>• Report anything suspicious immediately</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        function saveToHistory(text, analysis) {
+            const newScan = {
+                id: Date.now(),
+                text: text.length > 60 ? text.substring(0, 60) + '...' : text,
+                risk: analysis.score >= 75 ? 'high' : analysis.score >= 50 ? 'medium' : analysis.score >= 25 ? 'low' : 'safe',
+                score: analysis.score,
+                date: 'Just now',
+                platform: detectPlatform(text)
+            };
+            
+            SecureCheck.scanHistory.unshift(newScan);
+            SecureCheck.user.scansToday += 1;
+            SecureCheck.user.totalScans += 1;
+            
+            // Update real-time statistics
+            SecureCheck.realTimeData.totalScans += 1;
+            if (analysis.score >= 75) {
+                SecureCheck.realTimeData.scamsBlocked += 1;
+                SecureCheck.realTimeData.moneySaved += Math.floor(Math.random() * 15000) + 5000;
+            }
+            
+            // Update dashboard if open
+            if (document.getElementById('dashboard').classList.contains('active')) {
+                loadDashboardData();
+            }
+        }
+
+        function detectPlatform(text) {
+            const textLower = text.toLowerCase();
+            if (textLower.includes('whatsapp')) return 'whatsapp';
+            if (textLower.includes('linkedin')) return 'linkedin';
+            if (textLower.includes('telegram')) return 'telegram';
+            if (textLower.includes('@') && textLower.includes('.com')) return 'email';
+            return 'other';
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${getToastIcon(type)}"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="ml-auto text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function getToastIcon(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                info: 'info-circle',
+                danger: 'exclamation-triangle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // Dashboard Functions
+        function loadDashboardData() {
+            loadActivityList();
+            loadThreatFeed();
+            updateUserStats();
+        }
+
+        function loadActivityList() {
+            const container = document.getElementById('activityList');
+            if (!container) return;
+            
+            container.innerHTML = SecureCheck.scanHistory.map(scan => `
+                <div class="flex items-center justify-between p-4 glass rounded-xl">
+                    <div class="flex-1">
+                        <p class="font-medium truncate">${scan.text}</p>
+                        <div class="flex items-center gap-3 mt-2">
+                            <span class="px-2 py-1 bg-${scan.risk}/10 text-${scan.risk} rounded-lg text-xs font-bold">
+                                ${scan.risk.toUpperCase()}
+                            </span>
+                            <span class="text-xs text-gray-400">${scan.date}</span>
+                            <span class="text-xs text-gray-400">• ${scan.platform}</span>
+                        </div>
+                    </div>
+                    <div class="text-right ml-4">
+                        <p class="text-2xl font-bold text-${scan.risk}">${scan.score}</p>
+                        <p class="text-xs text-gray-400">score</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadThreatFeed() {
+            const container = document.getElementById('threatFeed');
+            if (!container) return;
+            
+            container.innerHTML = SecureCheck.threatFeed.map(threat => `
+                <div class="flex items-start gap-3 p-4 bg-${threat.type}/5 border border-${threat.type}/20 rounded-xl">
+                    <div class="w-10 h-10 rounded-lg bg-${threat.type}/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-${getThreatIcon(threat.type)} text-${threat.type}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm">${threat.text}</p>
+                        <p class="text-xs text-gray-400 mt-1">${threat.time}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getThreatIcon(type) {
+            const icons = {
+                danger: 'exclamation-triangle',
+                warning: 'exclamation-circle',
+                success: 'check-circle',
+                info: 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        function updateUserStats() {
+            // Update any live stats on dashboard
+            // This would update counters, charts, etc.
+        }
+
+        // Utility Functions
+        function viewCityReport(city) {
+            const hotspot = SecureCheck.realTimeData.scamHotspots.find(h => h.city === city);
+            if (hotspot && SecureCheck.map) {
+                SecureCheck.map.setView([hotspot.lat, hotspot.lng], 10);
+                showToast(`Viewing scam report for ${city}`, 'info');
+            }
+        }
+
+        function reportScam() {
+            showToast('Scam reported. Thank you for helping protect others!', 'success');
+            // In real implementation, this would send data to backend
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-backdrop')) {
+                hideModal(event.target.closest('.modal').id);
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.mobile-menu');
+            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            
+            if (menu.classList.contains('active') && 
+                !menu.contains(event.target) && 
+                !menuButton.contains(event.target)) {
+                toggleMobileMenu(false);
+            }
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (!modal.classList.contains('hidden')) {
+                        hideModal(modal.id);
+                    }
+                });
+                toggleMobileMenu(false);
+            }
+        });
+
+        // Window resize handler for map
+        window.addEventListener('resize', function() {
+            if (SecureCheck.map) {
+                setTimeout(() => SecureCheck.map.invalidateSize(), 100);
+            }
+        });
+    </script>
+</body>
+</html>
